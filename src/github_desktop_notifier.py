@@ -5,8 +5,7 @@ import subprocess
 import shutil
 import threading
 
-from dotenv import load_dotenv
-from .github import Github
+from github import Github
 
 # Constants #
 
@@ -23,7 +22,6 @@ DIRECTORY_PATH = os.path.dirname(FILE_PATH)
 PARENT_DIRECTORY_PATH = os.path.dirname(DIRECTORY_PATH)
 
 GITHUB_ICON_PATH = os.path.join(PARENT_DIRECTORY_PATH, "assets", "github.png")
-ENV_PATH = os.path.join(PARENT_DIRECTORY_PATH, ".env")
 
 # Variables #
 read_notifications = []
@@ -75,7 +73,8 @@ def send_notification(
 
 def open_and_mark_as_read(github, url, thread_id):
     os.system(f"xdg-open {url}")
-    github.mark_notification_as_read(thread_id)
+    if not github.mark_notification_as_read(thread_id):
+        print(f"Failed to mark notification {thread_id} as read")
 
 
 def get_detailed_web_url(subject_type, api_url, web_url):
@@ -99,10 +98,10 @@ def get_detailed_web_url(subject_type, api_url, web_url):
 
 def process_notifications(github):
     response = github.get_notifications()
-    if response.status_code != 200:
+    if not response:
         return
 
-    notifications = response.json()
+    notifications = response
     for notification in notifications:
         thread_id = notification["id"]
         unique_id = f"{thread_id}-{notification['updated_at']}"
@@ -157,21 +156,8 @@ def main():
         print("dunstify is not installed, please install it before running the script")
         exit(1)
 
-    # Load environment variables
-    load_dotenv(ENV_PATH)
-    token = os.getenv("GITHUB_TOKEN")
-    username = os.getenv("GITHUB_USER")
-    if (token is None or username is None) or (token == "" or username == ""):
-        print(f"Please provide GITHUB_TOKEN and GITHUB_USERNAME in the {ENV_PATH} file")
-        exit(1)
-    elif token == "your_github_token_here" or username == "your_github_username_here":
-        print(
-            f"Found default values in the {ENV_PATH} file, please replace them with your GitHub credentials"
-        )
-        exit(1)
-
     # Start the main loop
-    github = Github(token, username)
+    github = Github()
     main_loop(github)
 
 

@@ -12,7 +12,7 @@
 __version__ = "1.0.0"
 
 # Imports #
-from .github_desktop_notifier import main
+from github_desktop_notifier import main
 
 # Main #
 if __name__ == "__main__":

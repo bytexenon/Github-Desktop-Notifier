@@ -1,46 +1,72 @@
 # Imports #
-import requests
-from requests.auth import HTTPBasicAuth
+import subprocess
+import shutil
+import json
+
+
+# Response #
+class Response:
+    def __init__(self, status_code, message):
+        self.status_code = status_code
+        self.text = message
+
+    def __str__(self):
+        return f"Status Code: {self.status_code}, Text: {self.text}"
 
 
 # Github #
 class Github:
-    def __init__(self, token, username):
-        self.token = token
-        self.username = username
-        self._validate_credentials()
-        print("Successfully authenticated with GitHub")
+    """
+    A wrapper around the `gh` command-line tool for interacting with GitHub.
+    """
 
-    def _request(self, method, url, headers, data=None):
-        return requests.request(
-            method,
-            url,
-            headers=headers,
-            auth=HTTPBasicAuth(self.username, self.token),
-            data=data,
-        )
+    def __init__(self):
+        self._validate_installation()
+        self._validate_credentials()
+
+    def _run_command(self, *args, **kwargs):
+        try:
+            result = subprocess.run(
+                ["gh", *args],
+                capture_output=True,
+                text=True,
+                check=True,
+                **kwargs,
+            )
+            return result
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to run command: {e}")
+            return None
+
+    def _api_call(self, *args, **kwargs):
+        result = self._run_command("api", *args, **kwargs)
+        response = Response(1, "[]") if result == None else Response(0, result.stdout)
+        return response
+
+    def _validate_installation(self):
+        if shutil.which("gh") is None:
+            raise RuntimeError("The `gh` command-line tool is not installed.")
 
     def _validate_credentials(self):
-        url = "https://api.github.com/user"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        response = self._request("GET", url, headers)
-        if response.status_code != 200:
-            raise ValueError("Invalid GitHub token or username")
+        output = self._run_command("auth", "status").stdout
+        if "Logged in to github.com account" not in output:
+            answer = input("Would you like to log in to GitHub? (Y/n): ")
+            if answer.lower() in ["y", "yes", ""]:
+                self._login_if_needed()
+            else:
+                raise RuntimeError("You must be logged in to GitHub.")
+
+    def _login_if_needed(self):
+        self._run_command("auth", "login", "--web", "--git-protocol=HTTPS")
 
     def get_notifications(self):
-        url = "https://api.github.com/notifications"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        request = self._request("GET", url, headers)
-        if request.status_code != 200:
-            print("Failed to get notifications")
-            print(request.text)
-        return request
+        response = self._api_call("notifications")
+        if response.status_code == 0:
+            return json.loads(response.text)
+        return None
 
     def mark_notification_as_read(self, thread_id):
-        url = f"https://api.github.com/notifications/threads/{thread_id}"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        request = self._request("PATCH", url, headers)
-        if request.status_code != 205:
-            print(f"Failed to mark notification {thread_id} as read")
-            print(request.text)
-        return request
+        response = self._api_call(
+            f"notifications/threads/{thread_id}", "--method=PATCH"
+        )
+        return response.status_code == 0
