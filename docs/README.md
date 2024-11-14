@@ -8,7 +8,7 @@
 ## Features
 
 - **Real-time Notifications**: Receive instant desktop alerts for new GitHub activities.
-- **Interactive Actions**: Open notifications in your browser or mark them as read directly from the notification popup without opening your browser.
+- **Interactive Actions**: Open notifications in your browser or mark them as read directly from the notification popup.
 - **Supports All Notification Types**: Get notifications for issues, pull requests, comments, and more.
 - **Easy to Use**: Simply run the script and authenticate with GitHub via browser to start receiving notifications, no need to create GitHub API tokens.
 
