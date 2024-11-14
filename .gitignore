@@ -1,0 +1,13 @@
+*__pycache__*
+*.pyc
+*.tmp
+*.log
+*.o
+*.so
+*.vscode
+*.history
+*workspace*
+*build*
+*egg-info*
+build
+dist
