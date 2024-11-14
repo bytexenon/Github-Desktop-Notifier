@@ -6,7 +6,6 @@ import shutil
 import threading
 
 from dotenv import load_dotenv
-from requests.auth import HTTPBasicAuth
 from .github import Github
 
 # Constants #
