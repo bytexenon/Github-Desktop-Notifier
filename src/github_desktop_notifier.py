@@ -19,10 +19,12 @@ NOTIFICATION_URGENCY = "critical"
 REFRESH_RATE = 10  # In seconds
 TIMEOUT_TIME = 15  # If urgency is critical, this value is ignored
 
-FULL_PATH = os.path.realpath(__file__)
-GITHUB_ICON_PATH = os.path.join(os.path.dirname(FULL_PATH), "github.png")
-ENV_PATH = os.path.join(os.path.dirname(FULL_PATH), ".env")
+FILE_PATH = os.path.realpath(__file__)
+DIRECTORY_PATH = os.path.dirname(FILE_PATH)
+PARENT_DIRECTORY_PATH = os.path.dirname(DIRECTORY_PATH)
 
+GITHUB_ICON_PATH = os.path.join(PARENT_DIRECTORY_PATH, "assets", "github.png")
+ENV_PATH = os.path.join(PARENT_DIRECTORY_PATH, ".env")
 
 # Variables #
 read_notifications = []
@@ -193,8 +195,7 @@ def main_loop(github):
         time.sleep(REFRESH_RATE)
 
 
-# Main #
-if __name__ == "__main__":
+def main():
     # Check if command "dunstify" is available
     if shutil.which("dunstify") is None:
         print("dunstify is not installed, please install it before running the script")
@@ -216,3 +217,8 @@ if __name__ == "__main__":
     # Start the main loop
     github = Github(token, username)
     main_loop(github)
+
+
+# Main #
+if __name__ == "__main__":
+    main()
