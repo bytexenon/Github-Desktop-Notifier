@@ -5,7 +5,7 @@ import subprocess
 import shutil
 import threading
 
-from github import Github
+from .github import Github
 
 # Constants #
 
