@@ -145,7 +145,6 @@ class GithubDesktopNotifier:
             thread_id = notification["id"]
             unique_id = f"{thread_id}-{notification['updated_at']}"
             if unique_id in self.read_notifications:
-                print(f"Notification {unique_id} already read")
                 continue
             self.read_notifications.append(unique_id)
             full_repo_name = notification["repository"]["full_name"]
@@ -169,9 +168,7 @@ class GithubDesktopNotifier:
                     [
                         "open",
                         "Open",
-                        lambda: self.open_and_mark_as_read(
-                            web_url, thread_id
-                        ),
+                        lambda: self.open_and_mark_as_read(web_url, thread_id),
                     ],
                     [
                         "markAsRead",
