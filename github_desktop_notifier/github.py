@@ -47,8 +47,11 @@ class Github:
             raise RuntimeError("The `gh` command-line tool is not installed.")
 
     def _validate_credentials(self):
-        output = self._run_command("auth", "status")
-        if output == None or "Logged in to github.com account" not in output.stdout:
+        output = self._run_command("auth", "status", check=False)
+        if (
+            output.returncode != 0
+            or "You are not logged into any GitHub hosts" in output.stdout
+        ):
             answer = input("Would you like to log in to GitHub? (Y/n): ")
             if answer.lower() in ["y", "yes", ""]:
                 self._login_if_needed()
@@ -56,9 +59,13 @@ class Github:
                 raise RuntimeError("You must be logged in to GitHub.")
 
     def _login_if_needed(self):
-        self._run_command(
+        output = self._run_command(
             "auth", "login", "--web", "--git-protocol=HTTPS", capture_output=False
         )
+        if output.returncode != 0:
+            raise RuntimeError("Failed to log in to GitHub.")
+        else:
+            print("Successfully logged in to GitHub.")
 
     def get_notifications(self):
         response = self._api_call("notifications")
