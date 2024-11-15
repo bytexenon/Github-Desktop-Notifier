@@ -24,14 +24,13 @@ class Github:
         self._validate_installation()
         self._validate_credentials()
 
-    def _run_command(self, *args, **kwargs):
+    def _run_command(self, *args, capture_output=True, text=True, check=True):
         try:
             result = subprocess.run(
                 ["gh", *args],
-                capture_output=True,
-                text=True,
-                check=True,
-                **kwargs,
+                capture_output=capture_output,
+                text=text,
+                check=check,
             )
             return result
         except subprocess.CalledProcessError as e:
@@ -48,8 +47,8 @@ class Github:
             raise RuntimeError("The `gh` command-line tool is not installed.")
 
     def _validate_credentials(self):
-        output = self._run_command("auth", "status").stdout
-        if "Logged in to github.com account" not in output:
+        output = self._run_command("auth", "status")
+        if output == None or "Logged in to github.com account" not in output.stdout:
             answer = input("Would you like to log in to GitHub? (Y/n): ")
             if answer.lower() in ["y", "yes", ""]:
                 self._login_if_needed()
@@ -57,7 +56,9 @@ class Github:
                 raise RuntimeError("You must be logged in to GitHub.")
 
     def _login_if_needed(self):
-        self._run_command("auth", "login", "--web", "--git-protocol=HTTPS")
+        self._run_command(
+            "auth", "login", "--web", "--git-protocol=HTTPS", capture_output=False
+        )
 
     def get_notifications(self):
         response = self._api_call("notifications")
