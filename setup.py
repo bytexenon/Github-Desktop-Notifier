@@ -8,7 +8,7 @@ DIRNAME = os.path.dirname(__file__)
 SHORT_DESCRIPTION = "Receive instant GitHub notifications on your Linux desktop"
 LONG_DESCRIPTION = open(os.path.join(DIRNAME, "docs", "README.md")).read()
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 # Setup #
 setup(
