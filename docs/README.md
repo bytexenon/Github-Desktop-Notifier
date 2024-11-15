@@ -25,29 +25,55 @@ Before you begin, ensure you have the following installed:
 - **Python 3**: The script is written in Python and requires Python 3 to run.
 - **libnotify-bin**: Enables desktop notifications on Linux systems.
 - **GitHub CLI (`gh`)**: Allows the script to interact with GitHub.
+- **Pipx**: Used to install Python packages globally.
 
-**Install required packages on Debian/Ubuntu:**
+### Installation
+
+1. **Install required packages on Debian/Ubuntu:**
 
 ```bash
 sudo apt update
-sudo apt install -y python3 libnotify-bin gh
+sudo apt install -y python3 libnotify-bin gh pipx
 ```
 
-2. **Clone the Repository**: Download the script by cloning the repository.
+2. **Install GitHub Desktop Notifier:**
 
 ```bash
-git clone https://github.com/bytexenon/Github-Desktop-Notifier
-cd Github-Desktop-Notifier
+pipx install github-desktop-notifier
 ```
 
-## Usage
+### Usage
 
-Using GitHub Desktop Notifier is straightforward. Follow these steps to start receiving notifications:
-
-1. **Run the Script**: Start the script to begin receiving notifications.
+Using GitHub Desktop Notifier is simple. Just run the following command in your terminal:
 
 ```bash
-python src/__main__.py
+github-notifier
+```
+
+### Command-Line Options
+
+You can customize the behavior of the notifier using the following command-line options:
+
+```console
+$ github-notifier --help
+usage: github-notifier [-h] [--refresh-rate REFRESH_RATE] [--timeout TIMEOUT]
+                       [--urgency {low,normal,critical}] [--icon-path ICON_PATH]
+
+GitHub Desktop Notifier
+
+options:
+  -h, --help            show this help message and exit
+  --refresh-rate REFRESH_RATE
+                        Interval in seconds to check for new notifications (default:
+                        10)
+  --timeout TIMEOUT     Timeout in seconds for the notification (default: 15).
+                        Ignored if urgency is 'critical'.
+  --urgency {low,normal,critical}
+                        Urgency level of the notification: 'low', 'normal', or
+                        'critical' (default: critical)
+  --icon-path ICON_PATH
+                        Path to the icon to display in the notification (default:
+                        /path/to/github-logo.png)
 ```
 
 - If you haven't authenticated with `gh` (GitHub CLI), you'll be prompted to do so. Follow the instructions to authenticate via your web browser.
