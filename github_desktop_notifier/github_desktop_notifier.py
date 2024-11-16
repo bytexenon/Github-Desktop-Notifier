@@ -117,7 +117,7 @@ class GithubDesktopNotifier:
         if not self.github.mark_notification_as_read(thread_id):
             print(f"Failed to mark notification {thread_id} as read")
 
-    def get_detailed_web_url(self, subject_type, api_url, web_url):
+    def get_detailed_web_url(self, subject_type, api_url, web_url, thread_id):
         if subject_type == "Issue":
             issue_number = api_url.split("/")[-1]
             web_url = f"{web_url}/issues/{issue_number}"
@@ -133,6 +133,9 @@ class GithubDesktopNotifier:
         elif subject_type == "Release":
             release_tag = api_url.split("/")[-1]
             web_url = f"{web_url}/releases/tag/{release_tag}"
+        elif subject_type == "CheckSuite":
+            run_id = thread_id
+            web_url = f"{web_url}/actions/runs/{run_id}"
         return web_url
 
     def process_notifications(self):
@@ -152,7 +155,9 @@ class GithubDesktopNotifier:
             subject_type = notification["subject"]["type"]
             web_url = notification["repository"]["html_url"]
             api_url = notification["subject"]["url"]
-            web_url = self.get_detailed_web_url(subject_type, api_url, web_url)
+            web_url = self.get_detailed_web_url(
+                subject_type, api_url, web_url, thread_id
+            )
             title = f"New {subject_type} notification from {full_repo_name}"
             message = f"Reason: {notification_reason}\nURL: {web_url}"
 
