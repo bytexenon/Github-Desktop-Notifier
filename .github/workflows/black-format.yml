@@ -1,0 +1,41 @@
+name: Black Formatter
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install Black
+        run: pip install black
+
+      - name: Run Black
+        id: black
+        run: |
+          black --check .
+        continue-on-error: true
+
+      - name: Commit changes
+        if: steps.black.outcome == 'failure'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          black .
+          git add .
+          git commit -m "style: format code with Black"
+          git push
